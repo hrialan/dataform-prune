@@ -20,7 +20,7 @@ jobs:
         run: echo ${{ secrets.DOCKERHUB_USERNAME }}
 
       - name: Log in to Docker Hub
-        uses: docker/login-action@v3
+        uses: docker/login-action@v3.1.0
         with:
           username: ${{ secrets.DOCKERHUB_TOKEN }}
           password: ${{ secrets.DOCKERHUB_USERNAME }}
