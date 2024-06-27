@@ -15,7 +15,7 @@ RUN npm install
 COPY . .
 
 # Install Dataform CLI
-RUN npm i -g @dataform/cli@^3.0.0
+RUN npm i -g @dataform/cli@^2.9.0
 
 # Define the default command to run the script
 CMD ["node", "index.js"]
