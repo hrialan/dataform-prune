@@ -2,22 +2,6 @@
 const { BigQuery } = require('@google-cloud/bigquery');
 const fs = require('fs');
 const path = require('path');
-const { exec } = require('child_process');
-
-async function compileDataform() {
-  return new Promise((resolve, reject) => {
-    exec('dataform compile --json > ../dataform_output.json', (error, stdout, stderr) => {
-      if (error) {
-        console.error(`Error compiling Dataform: ${error.message}`);
-        return reject(error);
-      }
-      if (stderr) {
-        console.error(`Dataform compile stderr: ${stderr}`);
-      }
-      resolve(stdout);
-    });
-  });
-}
 
 async function extractBqResourcesFromDataformOutput(jsonFilePath) {
   const dataformOutput = JSON.parse(fs.readFileSync(jsonFilePath, 'utf8'));
@@ -99,26 +83,14 @@ async function listUnmanagedDataformTables(dataformOutputPath, bqTableRegexToIgn
   return JSON.stringify(unmanagedResources, null, 4);
 }
 
-const bqTableNamesToIgnore = [
-  "t_fact_order_mm_ytd_v3",
-  "t_fact_placeloop_organic_v1",
-  "t_fact_placeloop_paid_v1",
-  "t_fact_placeloop_user_info_v1",
-  "t_fact_rft_pbi_pd_it",
-  "t_map_stars_dtd",
-  "t_map_stars_per_month1",
-  "t_map_stars_per_month2",
-  "t_fact_actual_ytd_v3"
-];
-
 async function main() {
   try {
-    await compileDataform();
-    console.log('Dataform compilation completed.');
+    const bqTableNamesToIgnore = process.env.BQ_TABLE_NAMES_TO_IGNORE ? process.env.BQ_TABLE_NAMES_TO_IGNORE.split(',') : [];
+    const bqTableRegexToIgnore = process.env.BQ_TABLE_REGEX_TO_IGNORE || '';
 
     const unmanagedTables = await listUnmanagedDataformTables(
       path.join(__dirname, 'dataform_output.json'),
-      'v_am|t_prm',
+      bqTableRegexToIgnore,
       bqTableNamesToIgnore
     );
 
