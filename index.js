@@ -3,6 +3,7 @@ const { BigQuery } = require('@google-cloud/bigquery');
 const fs = require('fs');
 const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
+const readline = require('readline');
 
 // Function to extract BigQuery resources from Dataform output
 async function extractBqResourcesFromDataformOutput(jsonFilePath) {
@@ -87,6 +88,49 @@ async function listUnmanagedDataformTables(dataformOutputPath, bqTableRegexToIgn
   return JSON.stringify(unmanagedResources, null, 4);
 }
 
+// Function to delete unmanaged BigQuery tables and empty datasets
+async function deleteUnmanagedTables(unmanagedResources, autoApprove) {
+  for (const projectId in unmanagedResources) {
+    const client = new BigQuery({ projectId });
+    for (const datasetId in unmanagedResources[projectId]) {
+      for (const tableId of unmanagedResources[projectId][datasetId]) {
+        if (!autoApprove) {
+          const rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout
+          });
+
+          const answer = await new Promise((resolve) => {
+            rl.question(`Are you sure you want to delete table ${projectId}.${datasetId}.${tableId}? (yes/no): `, resolve);
+          });
+
+          rl.close();
+
+          if (answer.toLowerCase() !== 'yes') {
+            console.log(`Skipping deletion of table ${projectId}.${datasetId}.${tableId}`);
+            console.log('');  // Add space for clarity
+            continue;
+          }
+        }
+
+        console.log(`Deleting table ${projectId}.${datasetId}.${tableId}...`);
+        await client.dataset(datasetId).table(tableId).delete();
+        console.log(`Table ${projectId}.${datasetId}.${tableId} deleted.`);
+        console.log('');  // Add space for clarity
+      }
+
+      // Check if the dataset is empty and delete it if it is
+      const [tables] = await client.dataset(datasetId).getTables();
+      if (tables.length === 0) {
+        console.log(`Dataset ${projectId}.${datasetId} is empty. Deleting dataset...`);
+        await client.dataset(datasetId).delete();
+        console.log(`Dataset ${projectId}.${datasetId} deleted.`);
+        console.log('');  // Add space for clarity
+      }
+    }
+  }
+}
+
 // Main function to handle arguments and execute the script
 async function main() {
   const argv = yargs(hideBin(process.argv))
@@ -108,11 +152,25 @@ async function main() {
       description: 'Regex pattern for BigQuery table names to ignore',
       default: '',
     })
+    .option('deleteUnmanagedBqTables', {
+      alias: 'u',
+      type: 'boolean',
+      description: 'Delete unmanaged BigQuery tables',
+      default: false,
+    })
+    .option('autoApprove', {
+      alias: 'a',
+      type: 'boolean',
+      description: 'Automatically approve deletion of unmanaged tables',
+      default: false,
+    })
     .argv;
 
   const dataformOutputPath = argv.dataformOutputFile;
   const bqTableNamesToIgnore = argv.bqTableNamesToIgnore ? argv.bqTableNamesToIgnore.split(',') : [];
   const bqTableRegexToIgnore = argv.bqTableRegexToIgnore || null;
+  const deleteUnmanagedBqTables = argv.deleteUnmanagedBqTables;
+  const autoApprove = argv.autoApprove;
 
   // Check if the file exists
   if (!fs.existsSync(dataformOutputPath)) {
@@ -128,7 +186,17 @@ async function main() {
       bqTableNamesToIgnore
     );
 
+    console.log('');  // Add space for clarity
+    console.log('***************************** UNMANAGED TABLES *****************************');
     console.log('Unmanaged Tables:', unmanagedTables);
+
+    if (deleteUnmanagedBqTables && Object.keys(JSON.parse(unmanagedTables)).length > 0) {
+      console.log('');  // Add space for clarity
+      console.log('***************************** DELETION PROCESS *****************************');
+      console.log('');  // Add space for clarity
+      console.log('Starting to delete unmanaged tables...');
+      await deleteUnmanagedTables(JSON.parse(unmanagedTables), autoApprove);
+    }
   } catch (error) {
     console.error('Failed to compile Dataform or list unmanaged tables:', error);
   }
