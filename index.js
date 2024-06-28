@@ -6,7 +6,7 @@ const { exec } = require('child_process');
 
 async function compileDataform() {
   return new Promise((resolve, reject) => {
-    exec('cd datafom && dataform compile --json > ../dataform_output.json', (error, stdout, stderr) => {
+    exec('dataform compile --json > ../dataform_output.json', (error, stdout, stderr) => {
       if (error) {
         console.error(`Error compiling Dataform: ${error.message}`);
         return reject(error);
