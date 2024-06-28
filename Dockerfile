@@ -18,4 +18,4 @@ COPY . .
 RUN npm i -g @dataform/cli@^2.9.0
 
 # Define the default command to run the script
-CMD ["mv", ".", "/src/app/", "&&","node", "index.js"]
+CMD ["node", "index.js"]
