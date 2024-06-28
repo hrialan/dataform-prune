@@ -3,16 +3,16 @@
 FROM node:18
 
 # Set the working directory in the container
-WORKDIR /usr/src/app
+# WORKDIR /usr/src/app
 
 # Copy package.json and package-lock.json
-COPY package*.json ./
+# COPY package*.json ./
 
 # Install project dependencies
 RUN npm install
 
 # Copy the rest of the application files
-COPY . .
+# COPY . .
 
 # Install Dataform CLI
 RUN npm i -g @dataform/cli@^2.9.0

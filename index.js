@@ -38,7 +38,7 @@ async function extractBqResourcesFromDataformOutput(jsonFilePath) {
       bqResources[database][schema].push(tableName);
     }
   }
-
+  
   return JSON.stringify(bqResources, null, 4);
 }
 
