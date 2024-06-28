@@ -67,7 +67,7 @@ steps:
         dataform install
         dataform compile --json > dataform-output.json
 
-  - name: 'gcr.io/emea-fieldforce-gbl-emea-dv/dataform-prune'
+  - name: 'gcr.io/your-project-id/dataform-prune'
     id: 'Dataform prune'
     args: ["--dataformOutputFile", "dataform-output.json",
            "--bqTableRegexToIgnore", "^t_prm_|^v_am"],
