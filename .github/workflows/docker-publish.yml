@@ -27,7 +27,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: hrialan/dataform-prune:v1
+          tags: hrialan/dataform-prune:latest
 
       - name: Log out from Docker Hub
         run: docker logout
