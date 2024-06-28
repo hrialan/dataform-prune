@@ -1,8 +1,10 @@
 
 const { BigQuery } = require('@google-cloud/bigquery');
 const fs = require('fs');
-const path = require('path');
+const yargs = require('yargs/yargs');
+const { hideBin } = require('yargs/helpers');
 
+// Function to extract BigQuery resources from Dataform output
 async function extractBqResourcesFromDataformOutput(jsonFilePath) {
   const dataformOutput = JSON.parse(fs.readFileSync(jsonFilePath, 'utf8'));
   const bqResources = {};
@@ -26,6 +28,7 @@ async function extractBqResourcesFromDataformOutput(jsonFilePath) {
   return JSON.stringify(bqResources, null, 4);
 }
 
+// Function to get BigQuery resources from projects
 async function getBqResourcesFromProjects(projectIds) {
   const bqResources = {};
 
@@ -54,6 +57,7 @@ async function getBqResourcesFromProjects(projectIds) {
   return JSON.stringify(bqResources, null, 4);
 }
 
+// Function to list unmanaged Dataform tables
 async function listUnmanagedDataformTables(dataformOutputPath, bqTableRegexToIgnore, bqTableNamesToIgnore) {
   const dataformResources = JSON.parse(await extractBqResourcesFromDataformOutput(dataformOutputPath));
   const projectIds = Object.keys(dataformResources);
@@ -83,18 +87,48 @@ async function listUnmanagedDataformTables(dataformOutputPath, bqTableRegexToIgn
   return JSON.stringify(unmanagedResources, null, 4);
 }
 
+// Main function to handle arguments and execute the script
 async function main() {
-  try {
-    const bqTableNamesToIgnore = process.env.BQ_TABLE_NAMES_TO_IGNORE ? process.env.BQ_TABLE_NAMES_TO_IGNORE.split(',') : [];
-    const bqTableRegexToIgnore = process.env.BQ_TABLE_REGEX_TO_IGNORE || '';
+  const argv = yargs(hideBin(process.argv))
+    .option('dataformOutputFile', {
+      alias: 'd',
+      type: 'string',
+      description: 'Path to the Dataform output JSON file',
+      demandOption: true,
+    })
+    .option('bqTableNamesToIgnore', {
+      alias: 'n',
+      type: 'string',
+      description: 'Comma-separated list of BigQuery table names to ignore',
+      default: '',
+    })
+    .option('bqTableRegexToIgnore', {
+      alias: 'r',
+      type: 'string',
+      description: 'Regex pattern for BigQuery table names to ignore',
+      default: '',
+    })
+    .argv;
 
+  const dataformOutputPath = argv.dataformOutputFile;
+  const bqTableNamesToIgnore = argv.bqTableNamesToIgnore ? argv.bqTableNamesToIgnore.split(',') : [];
+  const bqTableRegexToIgnore = argv.bqTableRegexToIgnore || null;
+
+  // Check if the file exists
+  if (!fs.existsSync(dataformOutputPath)) {
+    console.error(`File not found: ${dataformOutputPath}`);
+    process.exit(1);
+  }
+
+  try {
+    console.log('Starting to list unmanaged Dataform tables...');
     const unmanagedTables = await listUnmanagedDataformTables(
-      path.join(__dirname, 'dataform_output.json'),
+      dataformOutputPath,
       bqTableRegexToIgnore,
       bqTableNamesToIgnore
     );
 
-    console.log(unmanagedTables);
+    console.log('Unmanaged Tables:', unmanagedTables);
   } catch (error) {
     console.error('Failed to compile Dataform or list unmanaged tables:', error);
   }

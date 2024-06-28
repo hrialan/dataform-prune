@@ -1,15 +1,13 @@
 {
     "name": "dataform-prune",
     "version": "1.0.0",
-    "description": "",
+    "description": "Prune Dataform unmanaged resources from BigQuery",
     "main": "index.js",
-    "scripts": {
-      "start": "node index.js"
-    },
     "author": "Hugo Rialan",
     "license": "MIT",
     "dependencies": {
-      "@google-cloud/bigquery": "^7.8.0"
+        "@google-cloud/bigquery": "^7.8.0",
+        "eslint": "^9.5.0",
+        "yargs": "^17.0.0"
     }
-  }
-  
+}
