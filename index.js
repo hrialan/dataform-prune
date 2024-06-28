@@ -6,7 +6,7 @@ const { exec } = require('child_process');
 
 async function compileDataform() {
   return new Promise((resolve, reject) => {
-    exec('dataform compile --json > dataform_output.json', (error, stdout, stderr) => {
+    exec('cd datafom && dataform compile --json > ../dataform_output.json', (error, stdout, stderr) => {
       if (error) {
         console.error(`Error compiling Dataform: ${error.message}`);
         return reject(error);
@@ -38,7 +38,7 @@ async function extractBqResourcesFromDataformOutput(jsonFilePath) {
       bqResources[database][schema].push(tableName);
     }
   }
-  
+
   return JSON.stringify(bqResources, null, 4);
 }
 
