@@ -186,11 +186,18 @@ async function main() {
       bqTableNamesToIgnore
     );
 
+    if (Object.keys(JSON.parse(unmanagedTables)).length === 0) {
+      console.log('');  // Add space for clarity
+      console.log('***************************** NO UNMANAGED TABLES *****************************');
+      console.log('No unmanaged tables found.');
+      return;
+    }
+
     console.log('');  // Add space for clarity
     console.log('***************************** UNMANAGED TABLES *****************************');
     console.log('Unmanaged Tables:', unmanagedTables);
 
-    if (deleteUnmanagedBqTables && Object.keys(JSON.parse(unmanagedTables)).length > 0) {
+    if (deleteUnmanagedBqTables) {
       console.log('');  // Add space for clarity
       console.log('***************************** DELETION PROCESS *****************************');
       console.log('');  // Add space for clarity
