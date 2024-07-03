@@ -2,9 +2,10 @@
 
 ## Overview
 
-**Dataform-Prune** is an open-source project designed to efficiently manage and optimize your Dataform configurations through JavaScript scripts and a Docker image that can be integrated into your CI/CD pipelines. Dataform-Prune automates the removal of obsolete or unused objects, ensuring optimal performance and storage usage in your data workflows.
+**Dataform-Prune** is an open-source project designed to efficiently manage and optimize your Dataform configurations through JavaScript scripts and a Docker image that can be seamlessly integrated into your CI/CD pipelines. Dataform-Prune automates the removal of obsolete or unused objects, ensuring optimal performance and storage usage in your data workflows.
 
 ## Features
+
 - **Automated Cleanup:** Easily remove outdated tables, views, and other data artifacts.
 - **Storage Optimization:** Maintain a lean and performant data warehouse.
 - **Seamless Integration:** Use within your CI/CD pipelines for regular, automated maintenance.
@@ -17,16 +18,16 @@
 - Dataform CLI and a Dataform project
 - Google Cloud Platform (GCP) account with BigQuery access
 
-### Manual usage
+### Manual Usage
 
-To run the tool manually, you firstly need to create a compilation file of your Dataform project. This can be done by running the following commands in the root of your Dataform project:
+First, create a compilation file of your Dataform project by running the following commands in the root of your Dataform project:
 
 ```sh
 dataform install 
 dataform compile --json > dataform-output.json
 ```
 
-A new json file has now been created in the root of your Dataform project. This file contains all the defined actions and datasets in your Dataform project. You can now clone this repository and run the following command:
+A new JSON file (`dataform-output.json`) will be created in the root of your Dataform project, containing all defined actions and datasets. You can now clone the Dataform-Prune repository and run the following command:
 
 ```sh
 node prune.js --dataformOutputFile /path/to/the/just/created/json/file \
@@ -44,16 +45,16 @@ node prune.js --dataformOutputFile dataform-output.json \
               --deleteUnmanagedBqTables true
 ```
 
-In order for the script to run correctly, you need to be bigquery admin in the project where the tables are located.
+Ensure you have BigQuery admin permissions in the project where the tables are located for the script to run correctly.
 
 
-### CI/CD pipeline and automation
+### CI/CD Pipeline and Automation
 
-To automate the process of pruning Dataform actions and datasets, you can use this tool in a CI/CD pipeline using Cloud Build. 
+To automate the pruning process, you can use this tool in a CI/CD pipeline with Google Cloud Build.
 
-A docker image has been created for this tool and can be found in docker hub. You can can direcly use this image in your Cloud Build configuration file.
+A Docker image for this tool is available on Docker Hub. You can directly use this image in your Cloud Build configuration file.
 
- Here is an example of a Cloud Build configuration file:
+Example Cloud Build configuration file:
 
 ```yaml
 steps:
@@ -75,9 +76,9 @@ steps:
            "--autoApprove", "true"]
 ```
 
-Be careful with the `--autoApprove` flag. If you set it to `true`, the tool will delete the tables/views without asking for confirmation.
+⚠️ Caution: With the `--autoApprove` flag set to true, the tool will delete the tables/views without asking for confirmation.
 
-The best practice in production is to firstly set deleteUnmanagedBqTables to false when creating a PR and then set it to true when merging the PR to your default branch. This can easily be done in your CI/CD configuration file.
+To follow best practices in production, initially set `deleteUnmanagedBqTables` to false when creating a PR, and set it to true when merging the PR to your default branch. This can easily be configured in your CI/CD file.
 
 ## Contributing
 We welcome contributions! If you'd like to contribute, please fork the repository and use a feature branch. Pull requests are warmly welcome.
