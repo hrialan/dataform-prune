@@ -2,7 +2,7 @@
 
 ## Overview
 
-**Dataform-Prune** is an open-source project designed to efficiently manage and optimize your Dataform configurations through JavaScript scripts and a Docker image that can be seamlessly integrated into your CI/CD pipelines. Dataform-Prune automates the removal of obsolete or unused objects in your warehouse, ensuring optimal performance and storage usage in your data workflows.
+**dataform-prune** is an open-source solution that optimizes Dataform configurations by removing obsolete or unused warehouse objects. Seamlessly integrate it into your CI/CD pipelines using JavaScript scripts and a Docker image for improved performance and storage efficiency.
 
 ## Features
 
