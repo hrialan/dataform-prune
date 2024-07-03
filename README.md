@@ -1,17 +1,21 @@
-# Dataform prune automation tool
+# Dataform-Prune: Streamline and Optimize Your Dataform Workflows
 
-This tool is used to automate the process of pruning Dataform actions and datasets. It is designed to be used in a CI/CD pipeline to ensure that only the defined Dataform actions and datasets are created in the warehouse.
+## Overview
 
-One drawback of Dataform is that this tool is stateless, meaning that it does not know what actions and datasets are currently in the warehouse. If an SQLx file is deleted from Dataform, the corresponding action and dataset will still exist in the warehouse. This tool is designed to solve this problem by comparing the defined actions and datasets in the Dataform project to the actions and datasets in the warehouse. If a table/view is existing in the warehouse but not defined in the Dataform project, the tool will delete the table/view from the warehouse.
+**Dataform-Prune** is an open-source project designed to efficiently manage and optimize your Dataform configurations through JavaScript scripts and a Docker image that can be integrated into your CI/CD pipelines. Dataform-Prune automates the removal of obsolete or unused objects, ensuring optimal performance and storage usage in your data workflows.
 
+## Features
+- **Automated Cleanup:** Easily remove outdated tables, views, and other data artifacts.
+- **Storage Optimization:** Maintain a lean and performant data warehouse.
+- **Seamless Integration:** Use within your CI/CD pipelines for regular, automated maintenance.
 
 ## Usage
 
-### Pre-requisites
+### Prerequisites
 
 - Node.js
-- NPM
-- Dataform project
+- Dataform CLI and a Dataform project
+- Google Cloud Platform (GCP) account with BigQuery access
 
 ### Manual usage
 
@@ -25,7 +29,7 @@ dataform compile --json > dataform-output.json
 A new json file has now been created in the root of your Dataform project. This file contains all the defined actions and datasets in your Dataform project. You can now  clone this repository and run the following command:
 
 ```sh
-node index.js --dataformOutputFile /path/to/the/just/created/json/file \
+node prune.js --dataformOutputFile /path/to/the/just/created/json/file \
               --bqTableRegexToIgnore /regex/to/ignore/tables/in/your/warehouse \
               --bqTableNamesToIgnore /comma/separated/table/names/to/ignore/in/your/warehouse \
               --deleteUnmanagedBqTables /true/if/you/want/to/delete/unmanaged/tables/in/your/warehouse
@@ -34,8 +38,8 @@ node index.js --dataformOutputFile /path/to/the/just/created/json/file \
 e.g.
 
 ```sh
-node index.js --dataformOutputFile dataform-output.json \
-              --bqTableRegexToIgnore "^t_prm_|^v_am" \
+node prune.js --dataformOutputFile dataform-output.json \
+              --bqTableRegexToIgnore "^t_prm_|^t_test" \
               --bqTableNamesToIgnore "table1,table2" \
               --deleteUnmanagedBqTables true
 ```

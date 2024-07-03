@@ -2,7 +2,7 @@
     "name": "dataform-prune",
     "version": "1.0.0",
     "description": "Prune Dataform unmanaged resources from BigQuery",
-    "main": "index.js",
+    "main": "prune.js",
     "author": "Hugo Rialan",
     "license": "MIT",
     "dependencies": {
