@@ -1,4 +1,6 @@
-# Dataform-Prune: Streamline and Optimize Your Dataform Workflows
+# Dataform Prune
+
+An open-source tool for automating the cleanup of outdated objects in Dataform configurations, optimizing data workflows with seamless CI/CD integration.
 
 ## Overview
 
