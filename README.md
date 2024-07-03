@@ -19,14 +19,14 @@
 
 ### Manual usage
 
-To run the tool manually, you firstly need to create a compilation file of your Dataform project. This can be done by running the following command in the root of your Dataform project:
+To run the tool manually, you firstly need to create a compilation file of your Dataform project. This can be done by running the following commands in the root of your Dataform project:
 
 ```sh
 dataform install 
 dataform compile --json > dataform-output.json
 ```
 
-A new json file has now been created in the root of your Dataform project. This file contains all the defined actions and datasets in your Dataform project. You can now  clone this repository and run the following command:
+A new json file has now been created in the root of your Dataform project. This file contains all the defined actions and datasets in your Dataform project. You can now clone this repository and run the following command:
 
 ```sh
 node prune.js --dataformOutputFile /path/to/the/just/created/json/file \
@@ -51,13 +51,9 @@ In order for the script to run correctly, you need to be bigquery admin in the p
 
 To automate the process of pruning Dataform actions and datasets, you can use this tool in a CI/CD pipeline using Cloud Build. 
 
-Firstly you need to create a docker image and to store in in artifact registry. You can clone the repository and use the following command:
+A docker image has been created for this tool and can be found in docker hub. You can can direcly use this image in your Cloud Build configuration file.
 
-```sh
-gcloud builds submit --tag gcr.io/your-project-id/dataform-prune
-```
-
-Then you can add a step in your Cloud Build configuration file to run the tool. Here is an example of a Cloud Build configuration file:
+ Here is an example of a Cloud Build configuration file:
 
 ```yaml
 steps:
@@ -71,7 +67,7 @@ steps:
         dataform install
         dataform compile --json > dataform-output.json
 
-  - name: 'gcr.io/your-project-id/dataform-prune'
+  - name: 'hrialan/dataform-prune:latest'
     id: 'Dataform prune'
     args: ["--dataformOutputFile", "dataform-output.json",
            "--bqTableRegexToIgnore", "^t_prm_|^v_am"],
@@ -80,3 +76,14 @@ steps:
 ```
 
 Be careful with the `--autoApprove` flag. If you set it to `true`, the tool will delete the tables/views without asking for confirmation.
+
+The best practice in production is to firstly set deleteUnmanagedBqTables to false when creating a PR and then set it to true when merging the PR to your default branch. This can easily be done in your CI/CD configuration file.
+
+## Contributing
+We welcome contributions! If you'd like to contribute, please fork the repository and use a feature branch. Pull requests are warmly welcome.
+
+## License
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Contact
+For any inquiries or support, please open an issue on GitHub or contact me at `dataform-prune@hrialan.simpelogin.com`.
