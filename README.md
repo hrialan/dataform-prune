@@ -23,7 +23,7 @@
 First, create a compilation file of your Dataform project by running the following commands in the root of your Dataform project:
 
 ```sh
-dataform install 
+dataform install
 dataform compile --json > dataform-output.json
 ```
 
