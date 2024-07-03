@@ -6,4 +6,4 @@ COPY package.json /app/
 RUN npm install
 COPY . /app
 
-ENTRYPOINT ["node", "/app/index.js"]
+ENTRYPOINT ["node", "/app/prune.js"]
