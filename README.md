@@ -2,11 +2,11 @@
 
 ## Overview
 
-**Dataform-Prune** is an open-source project designed to efficiently manage and optimize your Dataform configurations through JavaScript scripts and a Docker image that can be seamlessly integrated into your CI/CD pipelines. Dataform-Prune automates the removal of obsolete or unused objects, ensuring optimal performance and storage usage in your data workflows.
+**Dataform-Prune** is an open-source project designed to efficiently manage and optimize your Dataform configurations through JavaScript scripts and a Docker image that can be seamlessly integrated into your CI/CD pipelines. Dataform-Prune automates the removal of obsolete or unused objects in your warehouse, ensuring optimal performance and storage usage in your data workflows.
 
 ## Features
 
-- **Automated Cleanup:** Easily remove outdated tables, views, and other data artifacts.
+- **Automated Cleanup:** Easily remove outdated tables, views, and datasets.
 - **Storage Optimization:** Maintain a lean and performant data warehouse.
 - **Seamless Integration:** Use within your CI/CD pipelines for regular, automated maintenance.
 
@@ -37,7 +37,6 @@ node prune.js --dataformOutputFile /path/to/the/just/created/json/file \
 ```
 
 e.g.
-
 ```sh
 node prune.js --dataformOutputFile dataform-output.json \
               --bqTableRegexToIgnore "^t_prm_|^t_test" \
