@@ -1,11 +1,14 @@
-
 const { BigQuery } = require('@google-cloud/bigquery');
 const fs = require('fs');
 const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
 const readline = require('readline');
 
-// Function to extract BigQuery resources from Dataform output
+/**
+ * Extracts BigQuery resources from Dataform output JSON file.
+ * @param {string} jsonFilePath - Path to the Dataform output JSON file.
+ * @returns {Promise<string>} - JSON string of BigQuery resources.
+ */
 async function extractBqResourcesFromDataformOutput(jsonFilePath) {
   const dataformOutput = JSON.parse(fs.readFileSync(jsonFilePath, 'utf8'));
   const bqResources = {};
@@ -29,7 +32,11 @@ async function extractBqResourcesFromDataformOutput(jsonFilePath) {
   return JSON.stringify(bqResources, null, 4);
 }
 
-// Function to get BigQuery resources from projects
+/**
+ * Retrieves BigQuery resources from specified projects.
+ * @param {string[]} projectIds - List of Google Cloud project IDs.
+ * @returns {Promise<string>} - JSON string of BigQuery resources.
+ */
 async function getBqResourcesFromProjects(projectIds) {
   const bqResources = {};
 
@@ -58,7 +65,13 @@ async function getBqResourcesFromProjects(projectIds) {
   return JSON.stringify(bqResources, null, 4);
 }
 
-// Function to list unmanaged Dataform tables
+/**
+ * Lists unmanaged Dataform tables by comparing Dataform output with existing BigQuery tables.
+ * @param {string} dataformOutputPath - Path to the Dataform output JSON file.
+ * @param {string} bqTableRegexToIgnore - Regex pattern for BigQuery table names to ignore.
+ * @param {string[]} bqTableNamesToIgnore - List of BigQuery table names to ignore.
+ * @returns {Promise<string>} - JSON string of unmanaged BigQuery resources.
+ */
 async function listUnmanagedDataformTables(dataformOutputPath, bqTableRegexToIgnore, bqTableNamesToIgnore) {
   const dataformResources = JSON.parse(await extractBqResourcesFromDataformOutput(dataformOutputPath));
   const projectIds = Object.keys(dataformResources);
@@ -88,7 +101,11 @@ async function listUnmanagedDataformTables(dataformOutputPath, bqTableRegexToIgn
   return JSON.stringify(unmanagedResources, null, 4);
 }
 
-// Function to delete unmanaged BigQuery tables and empty datasets
+/**
+ * Deletes unmanaged BigQuery tables and empty datasets.
+ * @param {Object} unmanagedResources - Object containing unmanaged BigQuery resources.
+ * @param {boolean} autoApprove - Flag to automatically approve deletion without prompt.
+ */
 async function deleteUnmanagedTables(unmanagedResources, autoApprove) {
   for (const projectId in unmanagedResources) {
     const client = new BigQuery({ projectId });
@@ -131,7 +148,9 @@ async function deleteUnmanagedTables(unmanagedResources, autoApprove) {
   }
 }
 
-// Main function to handle arguments and execute the script
+/**
+ * Main function to handle arguments and execute the script.
+ */
 async function main() {
   const argv = yargs(hideBin(process.argv))
     .option('dataformOutputFile', {
@@ -196,13 +215,16 @@ async function main() {
     console.log('');  // Add space for clarity
     console.log('***************************** UNMANAGED TABLES *****************************');
     console.log('Unmanaged Tables:', unmanagedTables);
+    console.log('');  // Add space for clarity
 
     if (deleteUnmanagedBqTables) {
-      console.log('');  // Add space for clarity
       console.log('***************************** DELETION PROCESS *****************************');
       console.log('');  // Add space for clarity
       console.log('Starting to delete unmanaged tables...');
       await deleteUnmanagedTables(JSON.parse(unmanagedTables), autoApprove);
+    } else {
+      console.log('***************************** SKIPPING DELETION PROCESS *****************************');
+      console.log('No unmanaged tables deleted. To delete unmanaged tables, use the --deleteUnmanagedBqTables flag.');
     }
   } catch (error) {
     console.error('Failed to compile Dataform or list unmanaged tables:', error);
